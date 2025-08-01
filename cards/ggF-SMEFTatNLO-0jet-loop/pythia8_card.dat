@@ -7,7 +7,7 @@
 ! General parameters 
 ! ==================
 !
-Main:numberOfEvents      = -1
+Main:numberOfEvents      = 0
 !
 ! -------------------------------------------------------------------
 ! Specify the HEPMC output of the Pythia8 shower. You can set it to:
@@ -81,7 +81,7 @@ SysCalc:fullCutVariation = off
 ! often irrelevant for phenomenology and very slow. You can turn this 
 ! feature off by uncommenting the line below if so desired.
 partonlevel:mpi = off
-SLHA:keepSM = on
-SLHA:minMassSM = 1000.
+#SLHA:keepSM = on
+#SLHA:minMassSM = 1000.
 25:onMode = off
 25:onIfMatch = 22 22
