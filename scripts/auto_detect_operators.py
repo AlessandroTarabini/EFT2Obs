@@ -26,10 +26,7 @@ searched for in the UFO model. Since this parameter is a function of other param
 the script recusively searches through the parameters to find which Wilson coefficients
 change the value of dWH.
 """
-from __future__ import print_function
 
-from builtins import next
-from builtins import str
 import sys
 import os
 import importlib
@@ -58,17 +55,16 @@ def getParameters(process, model, blocks):
   Find all parameters belonging to blocks and then cross-check with the param card.
   There may be fewer parameters in the param card if a restrict card was used.
   """
-  param_card = param_card_mod.ParamCard(os.path.join(MG_DIR, process.split('/')[-1], "Cards", "param_card.dat"))
-
+  param_card = param_card_mod.ParamCard(os.path.join(MG_DIR, process, "Cards", "param_card.dat"))
   params = []
   for param in model.all_parameters:
     block = param.lhablock
     if block in blocks:
       #check that this block exists in param card
-      assert block.lower() in list(param_card.keys()) #block names appear in lower case in param card
+      assert block.lower() in param_card.keys() #block names appear in lower case in param card
       
       #if this param in param card
-      if (param.lhacode[0],) in list(param_card[block.lower()].keys()):
+      if (param.lhacode[0],) in param_card[block.lower()].keys():
         params.append(param.name)
   return params
 
@@ -92,6 +88,10 @@ def makeReweight(process):
   command = "python scripts/make_reweight_card.py cards/%s/config.json cards/%s/reweight_card.dat"%(process, process)
   os.system(command)
 
+def makeParam(process):
+  print(">> Making param card")
+  command = "python scripts/make_param_card.py -p %s -c cards/%s/config.json -o cards/%s/param_card.dat"%(process, process, process)
+  os.system(command)
 
 """Method 1"""
 
@@ -100,7 +100,7 @@ delims = "()-+*/"
 regex = "".join(["\%s|"%delim for delim in delims])[:-1]
 
 def findRelevantParameters1(process, possible_params):
-  with open(os.path.join(MG_DIR, process.split('/')[-1], "SubProcesses", "coupl.inc"), "r") as f:
+  with open(os.path.join(MG_DIR, process, "SubProcesses", "coupl.inc"), "r") as f:
     couplings = []
 
     end = False
@@ -115,12 +115,24 @@ def findRelevantParameters1(process, possible_params):
           line = f.readline().strip("\n")
 
   couplings = couplings.replace(" ", "").split(",")
-
   parameters = []
   for coup in model.all_couplings:
     info = coup.get_all()
+    
     if info['name'] in couplings:
-      parameters.extend(re.split(regex, info['value'].replace(" ", ""))) #split according to +-/*()
+      #if type(info['value']) == dict:
+      #  assert len(info['value']) == 1, "%s \n %s"%(coup, info['value'])
+      #  value = info['value'].items()[0][1]
+      #else:
+      #  value = info['value']
+      #parameters.extend(re.split(regex, value.replace(" ", ""))) #split according to +-/*()
+
+      if type(info['value']) == dict:
+        values = [item[1] for item in info['value'].items()]
+      else:
+        values = [info['value']]
+      for value in values:
+        parameters.extend(re.split(regex, value.replace(" ", ""))) #split according to +-/*()
 
   return set(possible_params).intersection(parameters)
 
@@ -129,13 +141,13 @@ def findRelevantParameters1(process, possible_params):
 
 def getPSFiles(process):
   #assume all directories in SubProcesses folder are subprocesses
-  SubProcesses_path = os.path.join(MG_DIR, process.split('/')[-1], "SubProcesses")
-  subprocesses = next(os.walk(SubProcesses_path))[1]
+  SubProcesses_path = os.path.join(MG_DIR, process, "SubProcesses")  
+  subprocesses = os.walk(SubProcesses_path).next()[1]
 
   ps_files = []
   for subprocess in subprocesses:
     path = os.path.join(SubProcesses_path, subprocess)
-    ps_files_in_subprocess = [x for x in os.listdir(path) if x[-3:]==".ps"]
+    ps_files_in_subprocess = filter(lambda x: x[-3:]==".ps", os.listdir(path))
     ps_files.extend([os.path.join(path,ps_file) for ps_file in ps_files_in_subprocess])
 
   return ps_files
@@ -211,7 +223,7 @@ def expandParameters(params, model, level=0):
       new_params.append(param)
     else:
       maybe_params = re.split(regex, value.replace(" ", ""))
-      filtered_params = set([x for x in maybe_params if hasattr(model.parameters, x)]) 
+      filtered_params = set(filter(lambda x: hasattr(model.parameters, x), maybe_params)) 
       new_params.extend(expandParameters(filtered_params, model, level+1))
   return new_params
 
@@ -244,9 +256,9 @@ parser.add_argument('--blocks', '-b', default="SMEFT", help="Comma seperated lis
 parser.add_argument('--noValidation', default=False, action="store_true", help="Only use method 1. Do not bother using method 2 to validate")
 parser.add_argument('--noReweightCard', default=False, action="store_true", help="Do not make a reweight card.")
 parser.add_argument('--noConfigJson', default=False, action="store_true", help="Do not make a config json.")
+parser.add_argument('--ignore', default="Lambda", help="Comma seperated list of parameters to ignore, e.g. lambda")
 
-
-parser.add_argument('--def-val', type=float, default=0.01)
+parser.add_argument('--def-val', type=float, default=1.0)
 parser.add_argument('--set-inactive', type=str, nargs='*', help='')
 parser.add_argument('--def-sm', type=float, default=0.0)
 parser.add_argument('--def-gen', type=float, default=0.0)
@@ -255,6 +267,7 @@ args = parser.parse_args()
 
 process = args.process
 blocks = args.blocks.split(",")
+params_to_ignore = args.ignore.split(",")
 
 model = loadModel(process)
 smeftsim_v3 = ("SMEFTsim" in model.__name__) and (int(model.__version__[0]) == 3)
@@ -280,9 +293,15 @@ if smeftsim_v3:
 else:
   relevant_params = sorted(p1)
 
+for param in params_to_ignore:
+  if param in relevant_params:
+    print(">> Ignoring parameter: %s in selection"%param)
+    relevant_params.remove(param)
+
 print(">> Final relevant parameters: %s"%relevant_params)
 
 if not args.noConfigJson:
   makeConfig(process, model, relevant_params, args)
 if not args.noConfigJson and not args.noReweightCard:
   makeReweight(process)
+  makeParam(process)

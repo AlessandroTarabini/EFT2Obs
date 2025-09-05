@@ -13,7 +13,9 @@ from multiprocessing import Pool
 JOB_PREFIX = """#!/bin/bash
 set -o pipefail
 pushd %(PWD)s
+cmsenv
 source env.sh
+export PATH="/eos/user/a/atarabin/miniconda3/bin:$PATH"
 popd
 """
 
