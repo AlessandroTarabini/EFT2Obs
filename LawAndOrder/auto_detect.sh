@@ -18,3 +18,4 @@ cd ../..
 python ./scripts/auto_detect_operators.py -p ${process}_operators --noValidation --def-val 1.0 --noReweightCard --noConfigJson -b DIM6,DIM62F,DIM64F2L,DIM64F4L,DIM64F
 
 rm -r cards/${process}_operators 
+rm -r MG5_aMC_v2_9_16/${process}_operators 
