@@ -76,3 +76,15 @@ mkdir jobs_tree_loop_4
 
 python scripts/launch_gridpack.py ggF_SMEFTatNLO_tree_loop_4 -c 8 --job-mode condor --task-name gp-ggF_SMEFTatNLO_tree_loop_4 --dir jobs_tree_loop_4 --sub-opts '+MaxRuntime = 36000\nRequestCpus = 8'
 ```
+
+# Launch Jobs
+
+```
+python scripts/launch_jobs.py --gridpack gridpack_ggF_SMEFTatNLO_loop.tar.gz -j 200 -s 1 -e 2500 -p CMS_2025_I2915441 -o test-ggF-SMEFTatNLO-loop --sub-opts '+MaxRuntime = 18000' --task-name test-ggF-SMEFTatNLO-loop --dir jobs_evts_loop --job-mode condor --env "HIGGSPRODMODE=GGF"
+
+python scripts/launch_jobs.py --gridpack gridpack_ggF_SMEFTatNLO_tree.tar.gz -j 200 -s 1 -e 2500 -p CMS_2025_I2915441 -o test-ggF-SMEFTatNLO-tree --sub-opts '+MaxRuntime = 18000' --task-name test-ggF-SMEFTatNLO-tree --dir jobs_evts_tree --job-mode condor --env "HIGGSPRODMODE=GGF"
+
+python scripts/launch_jobs.py --gridpack gridpack_ggF_SMEFTatNLO_tree_loop_2.tar.gz -j 200 -s 1 -e 2500 -p CMS_2025_I2915441 -o test-ggF-SMEFTatNLO-tree-loop-2 --sub-opts '+MaxRuntime = 18000' --task-name test-ggF-SMEFTatNLO-tree-loop-2 --dir jobs_evts_tree_loop_2 --job-mode condor --env "HIGGSPRODMODE=GGF"
+
+python scripts/launch_jobs.py --gridpack gridpack_ggF_SMEFTatNLO_tree_loop_4.tar.gz -j 200 -s 1 -e 2500 -p CMS_2025_I2915441 -o test-ggF-SMEFTatNLO-tree-loop-4 --sub-opts '+MaxRuntime = 18000' --task-name test-ggF-SMEFTatNLO-tree-loop-4 --dir jobs_evts_tree_loop_4 --job-mode condor --env "HIGGSPRODMODE=GGF"
+```
