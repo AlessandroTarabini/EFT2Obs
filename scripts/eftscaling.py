@@ -17,7 +17,7 @@ class EFTTerm(object):
         self.params = tuple(sorted(params))
         self.val = np.array(val)
         self.uncert = np.array(uncert)
-    
+
     @classmethod
     def fromJSON(cls, t):
         return cls(t[0], t[1], t[2])
@@ -29,7 +29,7 @@ class EFTTerm(object):
         return [self.params, self.val.tolist(), self.uncert.tolist()]
 
     def oldJSONForBin(self, bin):
-        return [self.val[bin], self.uncert[bin]] + list(self.params) 
+        return [self.val[bin], self.uncert[bin]] + list(self.params)
 
 
 class EFTScaling(object):
@@ -55,7 +55,7 @@ class EFTScaling(object):
                 if len(filter) > 0 and p not in filter:
                     do_filter = True
             if do_filter:
-                continue 
+                continue
             terms.append(EFTTerm(params, vals, uncerts))
         terms.sort(key=lambda x : x.sortKey())
         return cls(nbins=len(e2ohist.sumW[0]), bin_edges=e2ohist.bin_edges, bin_labels=e2ohist.bin_labels, sm_vals=e2ohist.sumW[0], terms=terms)
@@ -105,14 +105,14 @@ class EFTScaling(object):
                 print('Skipping {}'.format(term.params))
                 continue
             x = np.copy(term.val)
-            x_err = np.copy(term.uncert)            
+            x_err = np.copy(term.uncert)
             for p in term.params:
                 x *= (coeffs[p] if p in coeffs else 0.)
                 x_err *= (coeffs[p] if p in coeffs else 0.)
             # print('Adding: {}, {}'.format(term.params, x))
             scaling += x
             scaling_err += (x_err * x_err)
-        
+
         result = (1. + scaling) * nominal
         result_err = np.sqrt(scaling_err) * nominal
 
@@ -125,7 +125,7 @@ class EFTScaling(object):
             return h_result
         else:
             return result, result_err
-    
+
     def getNominalTH1(self, name):
         proto = self.makeTH1Prototype(name)
         for ib in range(proto.GetNbinsX()):
@@ -143,7 +143,7 @@ class EFTScaling(object):
             x_label_list = []
             width_list = []
             for X in self.bin_edges:
-                # Add the width of this bin in Y to the previous edge
+              # Add the width of this bin in Y to the previous edge
                 edge_list.append(edge_list[-1] + (X[1][1] - X[1][0]))
                 width_list.append((X[0][1] - X[0][0]) * (X[1][1] - X[1][0]))
                 label_list.append('[%.2g, %.2g]' % (X[1][0], X[1][1]))
@@ -170,7 +170,7 @@ class EFTScaling(object):
 
     def is2D(self):
         return isinstance(self.bin_edges[0][0], list)
-    
+
     def writeToJSON(self, filename, legacy=False, translate_txt=dict()):
         with open(filename, 'w') as outfile:
             if legacy:
@@ -191,6 +191,78 @@ class EFTScaling(object):
                     "parameters": self.parameters() # this is as a convenience for other scripts, we won't parse it when reading in
                 }
             outfile.write(json.dumps(res, sort_keys=False))
+
+    def writeToCMSJSON(self, filename, indent=None):
+        with open(filename, 'w') as outfile:
+            res = {}
+            for i, bin_label in enumerate(self.bin_labels):
+                res[bin_label] = {}
+                for t in self.terms:
+                    term = t.asJSON()
+                    if len(term[0]) == 1: coeff = f"A_{term[0][0]}"
+                    else:
+                        if term[0][0] == term[0][1]: coeff = f"B_{term[0][0]}_2"
+                        else:                        coeff = f"B_{term[0][0]}_{term[0][1]}"
+                    res[bin_label][coeff] = term[1][i]
+                    res[bin_label]["u_" + coeff] = term[2][i]
+
+            outfile.write(json.dumps(res, sort_keys=True, indent=indent))
+
+    def writeToCommonJSON(self, filename, indent=None, decimals=16):
+        def removeIndentInLists(json_str):
+            new_str = ""
+            in_list = 0
+            for char in json_str:
+                if char == "[":
+                    in_list += 1
+                elif char == "]":
+                    in_list -= 1
+
+                if (char != "\n") or (in_list == 0):
+                    new_str += char
+
+            return new_str
+
+
+        def morePrettyPrinting(json_str):
+            lines = json_str.split("\n")
+            for i, line in enumerate(lines):
+                if "a_" in line or "b_" in line:
+                    label = line.split('"')[1]
+                    lines[i] = lines[i].replace(f'"{label}"', f'"{label}"'.ljust(20))
+
+                    numbers = lines[i].split("[")[1].split("]")[0]
+                    lines[i] = lines[i].replace(numbers, " ".join([x.rjust(8) for x in numbers.split()]))
+
+            return "\n".join(lines)
+
+        bin_ordering = np.argsort(self.bin_labels)
+
+        metadata = {
+            "coefficients": self.parameters(),
+            "observable_shape": "(%d,)"%self.nbins,
+            "observable_names": [self.bin_labels[idx] for idx in bin_ordering]
+        }
+
+        def getTermName(term):
+            if len(term.params) == 1:
+                return "a_" + "_".join(term.params)
+            else:
+                return "b_" + "_".join(term.params)
+
+        print(self.bin_labels)
+        print(self.terms[0].val[bin_ordering])
+        data = {
+            "central": {getTermName(term): term.val.round(decimals)[bin_ordering].tolist() for term in self.terms},
+            "u_MC": {getTermName(term): term.uncert.round(decimals)[bin_ordering].tolist() for term in self.terms},
+            "sm_xs": [f"{val:4g}" for val in self.sm_vals[bin_ordering]]
+        }
+        with open(filename, 'w') as outfile:
+            res = {"metadata": metadata, "data": data}
+            s = json.dumps(res, sort_keys=True, indent=indent)
+            s = removeIndentInLists(s)
+            s = morePrettyPrinting(s)
+            outfile.write(s)
 
     def writeToYAML(self, filename):
         with open(filename, 'w') as outfile:
@@ -262,7 +334,7 @@ class EFT2ObsHist(object):
         self.numEntries = np.array(numEntries)
         self.bin_edges = bin_edges
         self.bin_labels = bin_labels
-    
+
     @classmethod
     def fromJSON(cls, filename):
         with open(filename) as jsonfile:
@@ -277,12 +349,11 @@ class EFT2ObsHist(object):
 
     def nbins(self):
         return self.sumW.shape[1]
-    
+
     def add(self, other):
         self.sumW += other.sumW
         self.sumW2 += other.sumW2
         self.numEntries += other.numEntries
-
 
     def zeroTerms(self, terms=list(), allow_subset_match=False):
         for term in terms:
@@ -317,7 +388,7 @@ class EFT2ObsHist(object):
         stddev2 = meanW2 - meanW**2
         stderr = np.sqrt(np.divide(stddev2, self.numEntries, out=np.zeros_like(stddev2), where=((self.numEntries!=0) & (stddev2 > 0))))
         return meanW, stderr
-    
+
     def normedBinStats(self, divide_index=0):
         vals, uncerts = self.binStats()
         norm_vals = np.divide(vals, vals[divide_index], out=np.zeros_like(vals), where=vals[divide_index]>0)
