@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import os
 import sys
+import shutil
 
 parser = argparse.ArgumentParser()
 
@@ -39,6 +40,35 @@ def MaybeMakeDir(pathname):
     if not os.path.isdir(pathname) and not os.path.isfile(pathname):
         print('>> Creating directory %s' % pathname)
         subprocess.check_call(['mkdir', '-p', pathname])
+
+
+def EnsurePythonInPath():
+    """Ensure 'python' is available in PATH for rivet scripts that require it.
+    Creates a symlink from python3 to python if needed.
+    Returns (new_path, cleanup_dir) where cleanup_dir is None if no cleanup needed."""
+    # Check if python is already available
+    if shutil.which('python') is not None:
+        return (os.environ.get('PATH', ''), None)
+    
+    # python not found, check for python3
+    python3_path = shutil.which('python3')
+    if python3_path is None:
+        raise RuntimeError('Neither python nor python3 found in PATH')
+    
+    # Create a temporary directory for the symlink
+    tmpdir = os.environ.get('TMPDIR', '/tmp')
+    python_link_dir = os.path.join(tmpdir, 'python_link_%i' % os.getpid())
+    os.makedirs(python_link_dir, exist_ok=True)
+    python_link_path = os.path.join(python_link_dir, 'python')
+    
+    # Create symlink
+    if not os.path.exists(python_link_path):
+        os.symlink(python3_path, python_link_path)
+        print('>> Created python symlink: %s -> %s' % (python_link_path, python3_path))
+    
+    # Prepend to PATH
+    new_path = python_link_dir + os.pathsep + os.environ.get('PATH', '')
+    return (new_path, python_link_dir)
 
 
 # Path we're running from
@@ -191,10 +221,25 @@ else:
 os.chdir(iwd)
 
 if not finished:
-    rivet_args = ['rivet', '--analysis=%s' % plugins, '%s/events_%i.hepmc' % (tmpdir, seed), '-o', '%s/Rivet_%i.yoda' % (outdir, seed)]
-    if ignore_beams:
-        rivet_args.append('--ignore-beams')
-    subprocess.check_call(rivet_args)
+    # Ensure python is available in PATH for rivet scripts
+    rivet_env = os.environ.copy()
+    rivet_path, python_cleanup_dir = EnsurePythonInPath()
+    rivet_env['PATH'] = rivet_path
+    
+    try:
+        rivet_args = ['rivet', '--analysis=%s' % plugins, '%s/events_%i.hepmc' % (tmpdir, seed), '-o', '%s/Rivet_%i.yoda' % (outdir, seed)]
+        if ignore_beams:
+            rivet_args.append('--ignore-beams')
+        subprocess.check_call(rivet_args, env=rivet_env)
+    finally:
+        # Clean up the python symlink directory if it was created
+        if python_cleanup_dir is not None and os.path.exists(python_cleanup_dir):
+            try:
+                os.remove(os.path.join(python_cleanup_dir, 'python'))
+                os.rmdir(python_cleanup_dir)
+                print('>> Cleaned up python symlink directory: %s' % python_cleanup_dir)
+            except OSError as e:
+                print('>> Warning: Failed to clean up python symlink directory %s: %s' % (python_cleanup_dir, e))
 
 if save_hepmc is not None:
     subprocess.check_call(['mkdir', '-p', save_hepmc])

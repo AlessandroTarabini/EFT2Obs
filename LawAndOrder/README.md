@@ -24,7 +24,7 @@ sh auto_detect.sh ggF_SMEFTatNLO_tree_loop_4
 ```
 ./scripts/setup_process.sh ggF_SMEFTatNLO_tree
 
-python scripts/make_config.py -p ggF_SMEFTatNLO_tree -o cards/ggF_SMEFTatNLO_tree/config_SMEFTatNLO_ggH.json --pars dim6:2,4,7,8 dim62f:4,5,19,24 dim64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive dim6:1=1.000000e+03
+python scripts/make_config.py -p ggF_SMEFTatNLO_tree -o cards/ggF_SMEFTatNLO_tree/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62f:4,5,19,24 DIM64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
 
 python scripts/make_reweight_card.py cards/ggF_SMEFTatNLO_tree/config_SMEFTatNLO_ggH.json cards/ggF_SMEFTatNLO_tree/reweight_card.dat --prepend 'change process p p > h NP=2 QED=1 QCD=0' 'change process p p > h j NP=2 QED=1 QCD=1 --add' 'change process p p > h j j NP=2 QED=1 QCD=2 --add'
 
@@ -38,7 +38,7 @@ python scripts/launch_gridpack.py ggF_SMEFTatNLO_tree -c 8 --job-mode condor --t
 ```
 ./scripts/setup_process.sh ggF_SMEFTatNLO_loop
 
-python scripts/make_config.py -p ggF_SMEFTatNLO_loop -o cards/ggF_SMEFTatNLO_loop/config_SMEFTatNLO_ggH_no_cpg.json --pars dim6:2,4,7 dim62f:4,5,19,24 dim64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive dim6:1=1.000000e+03
+python scripts/make_config.py -p ggF_SMEFTatNLO_loop -o cards/ggF_SMEFTatNLO_loop/config_SMEFTatNLO_ggH_no_cpg.json --pars DIM6:2,4,8 DIM62F:4,5,19,24 DIM64F4L:7 --def-val 0.01 --def-sm 0.0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
 
 python scripts/make_reweight_card.py cards/ggF_SMEFTatNLO_loop/config_SMEFTatNLO_ggH_no_cpg.json cards/ggF_SMEFTatNLO_loop/reweight_card.dat --prepend 'change process p p > h NP=2 QED=1 QCD=2 [virt=QCD]' 'change process p p > h j NP=2 QED=1 QCD=3 [virt=QCD] --add' 'change process p p > h j j NP=2 QED=1 QCD=4 [virt=QCD] --add'
 
@@ -52,7 +52,7 @@ python scripts/launch_gridpack.py ggF_SMEFTatNLO_loop -c 8 --job-mode condor --t
 ```
 ./scripts/setup_process.sh ggF_SMEFTatNLO_tree_loop_2
 
-python scripts/make_config.py -p ggF_SMEFTatNLO_tree_loop_2 -o cards/ggF_SMEFTatNLO_tree_loop_2/config_SMEFTatNLO_ggH.json --pars dim6:2,4,7,8 dim62f:4,5,19,24 dim64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive dim6:1=1.000000e+03
+python scripts/make_config.py -p ggF_SMEFTatNLO_tree_loop_2 -o cards/ggF_SMEFTatNLO_tree_loop_2/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62f:4,5,19,24 DIM64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
 
 python scripts/make_reweight_card.py cards/ggF_SMEFTatNLO_tree_loop_2/config_SMEFTatNLO_ggH.json cards/ggF_SMEFTatNLO_tree_loop_2/reweight_card.dat --prepend 'change process p p > h NP=2 QCD=0 QED=1 QCD^2==2 NP^2==2 [virt=QCD]' 'change process p p > h j NP=2 QCD=1 QED=1 QCD^2==4 NP^2==2 [virt=QCD] --add' 'change process p p > h j j NP=2 QCD=2 QED=1 QCD^2==6 NP^2==2 [virt=QCD] --add'
 
@@ -66,7 +66,7 @@ python scripts/launch_gridpack.py ggF_SMEFTatNLO_tree_loop_2 -c 8 --job-mode con
 ```
 ./scripts/setup_process.sh ggF_SMEFTatNLO_tree_loop_4
 
-python scripts/make_config.py -p ggF_SMEFTatNLO_tree_loop_4 -o cards/ggF_SMEFTatNLO_tree_loop_4/config_SMEFTatNLO_ggH.json --pars dim6:2,4,7,8 dim62f:4,5,19,24 dim64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive dim6:1=1.000000e+03
+python scripts/make_config.py -p ggF_SMEFTatNLO_tree_loop_4 -o cards/ggF_SMEFTatNLO_tree_loop_4/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62f:4,5,19,24 DIM64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
 
 python scripts/make_reweight_card.py cards/ggF_SMEFTatNLO_tree_loop_4/config_SMEFTatNLO_ggH.json cards/ggF_SMEFTatNLO_tree_loop_4/reweight_card.dat --prepend 'change process p p > h NP=2 QCD=0 QED=1 QCD^2==2 NP^2==4 [virt=QCD]' 'change process p p > h j NP=2 QCD=1 QED=1 QCD^2==4 NP^2==4 [virt=QCD] --add' 'change process p p > h j j NP=2 QCD=2 QED=1 QCD^2==6 NP^2==4 [virt=QCD] --add'
 
@@ -87,4 +87,31 @@ python scripts/launch_jobs.py --gridpack gridpack_ggF_SMEFTatNLO_tree.tar.gz -j 
 python scripts/launch_jobs.py --gridpack gridpack_ggF_SMEFTatNLO_tree_loop_2.tar.gz -j 200 -s 1 -e 2500 -p CMS_2025_I2915441 -o test-ggF-SMEFTatNLO-tree-loop-2 --sub-opts '+MaxRuntime = 18000' --task-name test-ggF-SMEFTatNLO-tree-loop-2 --dir jobs_evts_tree_loop_2 --job-mode condor --env "HIGGSPRODMODE=GGF"
 
 python scripts/launch_jobs.py --gridpack gridpack_ggF_SMEFTatNLO_tree_loop_4.tar.gz -j 200 -s 1 -e 2500 -p CMS_2025_I2915441 -o test-ggF-SMEFTatNLO-tree-loop-4 --sub-opts '+MaxRuntime = 18000' --task-name test-ggF-SMEFTatNLO-tree-loop-4 --dir jobs_evts_tree_loop_4 --job-mode condor --env "HIGGSPRODMODE=GGF"
+```
+
+# Extracting parameterisations
+
+Once the events are generated, the various YODA files are merged together and the scaling equation are extracted.
+
+```
+yodamerge -o merged_yoda/ggF-SMEFTatNLO-loop.yoda test-ggF-SMEFTatNLO-loop/*
+
+yodamerge -o merged_yoda/ggF-SMEFTatNLO-tree.yoda test-ggF-SMEFTatNLO-tree/*
+
+yodamerge -o merged_yoda/ggF-SMEFTatNLO-tree-loop-2.yoda test-ggF-SMEFTatNLO-tree-loop-2/*
+
+yodamerge -o merged_yoda/ggF-SMEFTatNLO-tree-loop-4.yoda test-ggF-SMEFTatNLO-tree-loop-4/*
+```
+
+```
+mkdir params
+cd params
+
+python ../scripts/get_scaling.py -c ../cards/ggF_SMEFTatNLO_loop/config_SMEFTatNLO_ggH_no_cpg.json -i ../merged_yoda/ggF-SMEFTatNLO-loop.yoda --hist "/CMS_2025_I2915441/pt_h" -o loop_CMS_2025_I2915441_pt_h --bin-labels ../bin_labels.json
+
+python ../scripts/get_scaling.py -c ../cards/ggF_SMEFTatNLO_tree/config_SMEFTatNLO_ggH.json -i ../merged_yoda/ggF-SMEFTatNLO-tree.yoda --hist "/CMS_2025_I2915441/pt_h" -o tree_CMS_2025_I2915441_pt_h --bin-labels ../bin_labels.json
+
+python ../scripts/get_scaling.py -c ../cards/ggF_SMEFTatNLO_tree_loop_2/config_SMEFTatNLO_ggH.json -i ../merged_yoda/ggF-SMEFTatNLO-tree-loop-2.yoda --hist "/CMS_2025_I2915441/pt_h" -o tree-loop-2_CMS_2025_I2915441_pt_h --bin-labels ../bin_labels.json
+
+python ../scripts/get_scaling.py -c ../cards/ggF_SMEFTatNLO_tree_loop_4/config_SMEFTatNLO_ggH.json -i ../merged_yoda/ggF-SMEFTatNLO-tree-loop-4.yoda --hist "/CMS_2025_I2915441/pt_h" -o tree-loop-4_CMS_2025_I2915441_pt_h --bin-labels ../bin_labels.json
 ```

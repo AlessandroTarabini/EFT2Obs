@@ -71,6 +71,9 @@ for i in range(n_hists):
     if args.nlo:
         hists.append(aos['%s[rw%.4i_nlo]' % (hname, i)])
     else:
+        # if i == 0:
+        #     hists.append(aos['%s' % (hname)])
+        # else:
         hists.append(aos['%s[rw%.4i]' % (hname, i)])
 
 # print hists
@@ -91,7 +94,9 @@ else:
     print(nbins)
     edges = [list(hists[0].bins()[ib].xEdges()) for ib in range(nbins)]
     areas = list(hists[0].areas())
-    # print (areas,  [hists[0].bins[ib].sumW for ib in range(nbins)])
+    # areas = aos['%s' % (hname)].areas()/1000.
+    # print(areas)#,  [hists[0].bins[ib].sumW for ib in range(nbins)])
+
 
 for p in pars:
     for k in defs:
@@ -99,7 +104,6 @@ for p in pars:
             p[k] = defs[k]
 
 n_divider = 65
-
 
 def PrintEntry(label, val, err):
     print('%-20s | %12.4f | %12.4f | %12.4f' % (label, val, err, abs(err / val)))
@@ -118,6 +122,7 @@ assert(len(eftconstants) == len(hists))
 for ip, hist in enumerate(hists):
     hist.scaleW(1. / eftconstants[ip])
 
+# hists[0].scaleW(1./1000.)
 
 def initTerms(params):
     points = list()
@@ -148,6 +153,8 @@ if args.save_raw:
 if 'json' in save_formats:
     print('>> Saving histogram parametrisation to %s.json' % args.output)
     e2oscaling.writeToJSON('%s.json' % args.output, legacy=args.legacy)
+    e2oscaling.writeToCMSJSON('%s.CMS.json' % args.output, indent=1)
+    e2oscaling.writeToCommonJSON('%s.common.json' % args.output, indent=1, decimals=4)
 
 if 'yaml' in save_formats:
     print('>> Saving histogram parametrisation to %s.yaml' % args.output)
@@ -160,3 +167,4 @@ if 'txt' in save_formats:
 if 'tex' in save_formats:
     print('>> Saving histogram parametrisation to %s.tex' % args.output)
     e2oscaling.writeToTex('%s.tex' % args.output, translate_tex)
+                                                                      
