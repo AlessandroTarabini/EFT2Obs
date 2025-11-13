@@ -24,7 +24,7 @@ sh auto_detect.sh ggF_SMEFTatNLO_tree_loop_4
 ```
 ./scripts/setup_process.sh ggF_SMEFTatNLO_tree
 
-python scripts/make_config.py -p ggF_SMEFTatNLO_tree -o cards/ggF_SMEFTatNLO_tree/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62f:4,5,19,24 DIM64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
+python scripts/make_config.py -p ggF_SMEFTatNLO_tree -o cards/ggF_SMEFTatNLO_tree/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62F:4,5,19,24 DIM64F4L:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
 
 python scripts/make_reweight_card.py cards/ggF_SMEFTatNLO_tree/config_SMEFTatNLO_ggH.json cards/ggF_SMEFTatNLO_tree/reweight_card.dat --prepend 'change process p p > h NP=2 QED=1 QCD=0' 'change process p p > h j NP=2 QED=1 QCD=1 --add' 'change process p p > h j j NP=2 QED=1 QCD=2 --add'
 
@@ -52,7 +52,7 @@ python scripts/launch_gridpack.py ggF_SMEFTatNLO_loop -c 8 --job-mode condor --t
 ```
 ./scripts/setup_process.sh ggF_SMEFTatNLO_tree_loop_2
 
-python scripts/make_config.py -p ggF_SMEFTatNLO_tree_loop_2 -o cards/ggF_SMEFTatNLO_tree_loop_2/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62f:4,5,19,24 DIM64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
+python scripts/make_config.py -p ggF_SMEFTatNLO_tree_loop_2 -o cards/ggF_SMEFTatNLO_tree_loop_2/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62F:4,5,19,24 DIM64F4L:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
 
 python scripts/make_reweight_card.py cards/ggF_SMEFTatNLO_tree_loop_2/config_SMEFTatNLO_ggH.json cards/ggF_SMEFTatNLO_tree_loop_2/reweight_card.dat --prepend 'change process p p > h NP=2 QCD=0 QED=1 QCD^2==2 NP^2==2 [virt=QCD]' 'change process p p > h j NP=2 QCD=1 QED=1 QCD^2==4 NP^2==2 [virt=QCD] --add' 'change process p p > h j j NP=2 QCD=2 QED=1 QCD^2==6 NP^2==2 [virt=QCD] --add'
 
@@ -66,7 +66,7 @@ python scripts/launch_gridpack.py ggF_SMEFTatNLO_tree_loop_2 -c 8 --job-mode con
 ```
 ./scripts/setup_process.sh ggF_SMEFTatNLO_tree_loop_4
 
-python scripts/make_config.py -p ggF_SMEFTatNLO_tree_loop_4 -o cards/ggF_SMEFTatNLO_tree_loop_4/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62f:4,5,19,24 DIM64f4l:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
+python scripts/make_config.py -p ggF_SMEFTatNLO_tree_loop_4 -o cards/ggF_SMEFTatNLO_tree_loop_4/config_SMEFTatNLO_ggH.json --pars DIM6:2,4,7,8 DIM62F:4,5,19,24 DIM64F4L:7 --def-val 0.01 --def-sm 0 --def-gen 1E-8 --set-inactive DIM6:1=1.000000e+03
 
 python scripts/make_reweight_card.py cards/ggF_SMEFTatNLO_tree_loop_4/config_SMEFTatNLO_ggH.json cards/ggF_SMEFTatNLO_tree_loop_4/reweight_card.dat --prepend 'change process p p > h NP=2 QCD=0 QED=1 QCD^2==2 NP^2==4 [virt=QCD]' 'change process p p > h j NP=2 QCD=1 QED=1 QCD^2==4 NP^2==4 [virt=QCD] --add' 'change process p p > h j j NP=2 QCD=2 QED=1 QCD^2==6 NP^2==4 [virt=QCD] --add'
 

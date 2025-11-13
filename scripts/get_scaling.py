@@ -71,10 +71,10 @@ for i in range(n_hists):
     if args.nlo:
         hists.append(aos['%s[rw%.4i_nlo]' % (hname, i)])
     else:
-        # if i == 0:
-        #     hists.append(aos['%s' % (hname)])
-        # else:
-        hists.append(aos['%s[rw%.4i]' % (hname, i)])
+        if i == 0 and "tree" in args.input: # [TO BE UNDERSTOOD] In the tree, tree_loop_2 and tree_loop_4, the rw0000 is empty
+            hists.append(aos['%s' % (hname)])
+        else:
+            hists.append(aos['%s[rw%.4i]' % (hname, i)])
 
 # print hists
 is2D = isinstance(hists[0], yoda.Histo2D)
