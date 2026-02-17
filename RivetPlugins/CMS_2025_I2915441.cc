@@ -35,12 +35,19 @@ namespace Rivet {
       declare(fs_jets, "JETS");
 
       //---Histograms 
-      book(_h_pt_h, "pt_h", {0,15,30,45,80,120,200,350,13000});
+      // Run2 binning
+      // book(_h_pt_h, "pt_h",{0,5,10,15,20,25,30,35,45,60,80,100,120,140,170,200,250,350,450,10000}); 
+      // book(_h_rapidity_h, "rapidity_h", {0,0.15,0.3,0.6,0.9,2.5});
+      // book(_h_njets_eta2p5, "njets_eta2p5", {0,1,2,3,100});
+      // book(_h_jet_pt_lead, "jet_pt_lead", {0,30,75,120,200,13000});
+      // book(_h_cos_theta_star, "cos_theta_star", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
+      // 2022 binning 
+      book(_h_pt_h, "pt_h",{0,15,30,45,80,120,350,13000}); 
       book(_h_rapidity_h, "rapidity_h", {0,0.15,0.3,0.6,0.9,2.5});
-      book(_h_njets_eta2p5, "njets_eta2p5", {0,1,2,3,100});
+      book(_h_njets_eta4p7, "njets_eta4p7", {0,1,2,3,100});
       book(_h_jet_pt_lead, "jet_pt_lead", {0,30,75,120,200,13000});
+      book(_h_dphi_jj, "dphi_jj", {-5, -3.1415926536, -2.09439510239, -1.0471975512, 0, 1.0471975512, 2.09439510239, 3.1415926536});
       book(_h_cos_theta_star, "cos_theta_star", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
-
     }
 
     // cos theta star angle in the Collins Soper frame
@@ -88,7 +95,8 @@ namespace Rivet {
       _h_cos_theta_star->fill(getCosThetaStar_CS(isolated_photons[0].mom(), isolated_photons[1].mom()));
 
       //---jets
-      auto jets_eta2p5 = apply<FastJets>(event, "JETS").jetsByPt(Cuts::abseta < 2.5 && Cuts::pt > 30 * GeV);
+      // auto jets_eta2p5 = apply<FastJets>(event, "JETS").jetsByPt(Cuts::abseta < 2.5 && Cuts::pt > 30 * GeV);
+      auto jets_eta4p7 = apply<FastJets>(event, "JETS").jetsByPt(Cuts::abseta < 4.7 && Cuts::pt > 30 * GeV);
 
       //--- Isolate leptons for lepton cleaning
       //--- Implementing the logic for NanoAOD: https://github.com/bonanomi/cmssw/blob/69e3a519595c0d44d39dc8dc2f2ec562365ec90c/PhysicsTools/NanoAOD/plugins/GenPartIsoProducer.cc
@@ -110,22 +118,34 @@ namespace Rivet {
           if (mom_in_cone / mom_lep.pT() < 0.2) isolated_leptons.push_back(lep);
       }
 
-      idiscardIfAnyDeltaRLess(jets_eta2p5, isolated_photons, 0.4);
-      idiscardIfAnyDeltaRLess(jets_eta2p5, isolated_leptons, 0.4);
+      // idiscardIfAnyDeltaRLess(jets_eta2p5, isolated_photons, 0.4);
+      // idiscardIfAnyDeltaRLess(jets_eta2p5, isolated_leptons, 0.4);
+      idiscardIfAnyDeltaRLess(jets_eta4p7, isolated_photons, 0.4);
+      idiscardIfAnyDeltaRLess(jets_eta4p7, isolated_leptons, 0.4);
 
-      _h_njets_eta2p5->fill(jets_eta2p5.size());
-      if (jets_eta2p5.size() > 0) {
-        _h_jet_pt_lead->fill(jets_eta2p5[0].pt() / GeV);
+      // _h_njets_eta2p5->fill(jets_eta2p5.size());
+      _h_njets_eta4p7->fill(jets_eta4p7.size());
+
+      if (jets_eta4p7.size() > 0) {
+        _h_jet_pt_lead->fill(jets_eta4p7[0].pt() / GeV);
       }else{
         _h_jet_pt_lead->fill(0); // For the underflow bin Njet = 0
       }
+
+      if (jets_eta4p7.size() > 1) {
+        _h_dphi_jj->fill(deltaPhi(jets_eta4p7[0], jets_eta4p7[1]));
+      }else{
+        _h_dphi_jj->fill(-4); // For the underflow 
+      }
+
     }
 
     void finalize() {
       scale(_h_pt_h, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_rapidity_h, crossSection() / femtobarn * BR / sumOfWeights());
-      scale(_h_njets_eta2p5, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_njets_eta4p7, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_jet_pt_lead, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_dphi_jj, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_cos_theta_star, crossSection() / femtobarn * BR / sumOfWeights());
     }
 
@@ -133,8 +153,9 @@ namespace Rivet {
 
     Histo1DPtr _h_pt_h;
     Histo1DPtr _h_rapidity_h;
-    Histo1DPtr _h_njets_eta2p5;
+    Histo1DPtr _h_njets_eta4p7;
     Histo1DPtr _h_jet_pt_lead;
+    Histo1DPtr _h_dphi_jj;
     Histo1DPtr _h_cos_theta_star;
     const double BR = 0.00227;
   };

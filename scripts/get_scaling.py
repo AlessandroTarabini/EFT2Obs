@@ -94,7 +94,8 @@ else:
     print(nbins)
     edges = [list(hists[0].bins()[ib].xEdges()) for ib in range(nbins)]
     areas = list(hists[0].areas())
-    # areas = aos['%s' % (hname)].areas()/1000.
+    if "tree" in args.input: # [TO BE UNDERSTOOD]
+        areas = aos['%s' % (hname)].areas()/1000.
     # print(areas)#,  [hists[0].bins[ib].sumW for ib in range(nbins)])
 
 
@@ -122,7 +123,8 @@ assert(len(eftconstants) == len(hists))
 for ip, hist in enumerate(hists):
     hist.scaleW(1. / eftconstants[ip])
 
-# hists[0].scaleW(1./1000.)
+if "tree" in args.input: # [TO BE UNDERSTOOD]
+    hists[0].scaleW(1./1000.)
 
 def initTerms(params):
     points = list()
