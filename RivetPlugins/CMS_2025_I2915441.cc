@@ -42,12 +42,13 @@ namespace Rivet {
       // book(_h_jet_pt_lead, "jet_pt_lead", {0,30,75,120,200,13000});
       // book(_h_cos_theta_star, "cos_theta_star", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
       // 2022 binning 
-      book(_h_pt_h, "pt_h",{0,15,30,45,80,120,350,13000}); 
-      book(_h_rapidity_h, "rapidity_h", {0,0.15,0.3,0.6,0.9,2.5});
-      book(_h_njets_eta4p7, "njets_eta4p7", {0,1,2,3,100});
-      book(_h_jet_pt_lead, "jet_pt_lead", {0,30,75,120,200,13000});
-      book(_h_dphi_jj, "dphi_jj", {-5, -3.1415926536, -2.09439510239, -1.0471975512, 0, 1.0471975512, 2.09439510239, 3.1415926536});
-      book(_h_cos_theta_star, "cos_theta_star", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
+      book(_h_pt_h, "PTH",{0,15,30,45,80,120,200,350,13000}); 
+      book(_h_rapidity_h, "rapidity", {0,0.15,0.3,0.6,0.9,2.5});
+      book(_h_njets_eta4p7, "NJ", {0,1,2,3,100});
+      book(_h_jet_pt_lead, "PTJ0", {0,30,75,120,200,13000});
+      book(_h_dphi_jj, "DPhiJ0J1", {-5, -3.1415926536, -2.09439510239, -1.0471975512, 0, 1.0471975512, 2.09439510239, 3.1415926536});
+      book(_h_cos_theta_star, "CosThetaStarCS", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
+      book(_h_sigma, "h_sigma", 1, 0, 2); // This is to get the cross section without fiducial cuts
     }
 
     // cos theta star angle in the Collins Soper frame
@@ -58,7 +59,33 @@ namespace Rivet {
       return abs(cos(h1_boosted.theta()));
     }
 
+    double deltaphi_jj(const FourMomentum& h1, const FourMomentum& h2) {
+      //Direction of the two jets - vectors in the lab frame
+      Vector3 j1dir(h1.x(), h1.y(), h1.z());
+      Vector3 j2dir(h2.x(), h2.y(), h2.z());
+      //Transverse component in the xy plane
+      Vector3 jt1(h1.x(), h1.y(), 0);
+      Vector3 jt2(h2.x(), h2.y(), 0);
+      //Unit vectors of the transverse components
+      Vector3 jt1_norm   = jt1 * (1/jt1.mod());
+      Vector3 jt2_norm   = jt2 * (1/jt2.mod());
+      //Unit vector of the z axis
+      Vector3 z(0,0,1);
+      //Cross product between transverse components
+      double cross      = jt1_norm.cross(jt2_norm).dot(z);
+      double cross_norm = cross * (1 / abs(cross));
+      //Dot product between transverse components
+      double dot         = jt1_norm.dot(jt2_norm);
+      //Difference between the direction of the two jets
+      double diff       = (j1dir - j2dir).dot(z);
+      double diff_norm  = diff * (1 / abs(diff));
+      return acos(dot) * diff_norm * cross_norm;
+    }
+
+
     void analyze(const Event& event) {
+
+      _h_sigma->fill(1.); // To be filled before any fiducial cut
 
       Particles photons = apply<FinalState>(event, "FS_PHOTONS").particlesByPt();
 
@@ -133,7 +160,7 @@ namespace Rivet {
       }
 
       if (jets_eta4p7.size() > 1) {
-        _h_dphi_jj->fill(deltaPhi(jets_eta4p7[0], jets_eta4p7[1]));
+        _h_dphi_jj->fill(deltaphi_jj(jets_eta4p7[0].mom(), jets_eta4p7[1].mom()));
       }else{
         _h_dphi_jj->fill(-4); // For the underflow 
       }
@@ -147,6 +174,7 @@ namespace Rivet {
       scale(_h_jet_pt_lead, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_dphi_jj, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_cos_theta_star, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_sigma, crossSection() / femtobarn * BR / sumOfWeights());
     }
 
    private:
@@ -157,6 +185,7 @@ namespace Rivet {
     Histo1DPtr _h_jet_pt_lead;
     Histo1DPtr _h_dphi_jj;
     Histo1DPtr _h_cos_theta_star;
+    Histo1DPtr _h_sigma;
     const double BR = 0.00227;
   };
 
