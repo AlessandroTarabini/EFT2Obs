@@ -242,8 +242,10 @@ e2oscaling = EFTScaling.fromEFT2ObsHist(e2ohist, filter=filter,
                                         cross_terms=not args.skip_cross_terms)
 
 if args.exclude_rel is not None:
+    print('>> Excluding terms with relative uncertainty below %s' % args.exclude_rel)
     e2oscaling.excludeRel(args.exclude_rel)
 if args.exclude_abs is not None:
+    print('>> Excluding terms with absolute uncertainty below %s' % args.exclude_abs)
     e2oscaling.excludeAbs(args.exclude_abs)
 
 if args.save_raw:

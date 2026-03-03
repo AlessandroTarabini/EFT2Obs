@@ -391,5 +391,78 @@
       "TH_FWDH",
       "TH",
       "BUSLER"
+  ],
+  "/CMS_2025_I2915441/PTH": [
+      "pT_H_0_15",
+      "pT_H_15_30",
+      "pT_H_30_45",
+      "pT_H_45_80",
+      "pT_H_80_120",
+      "pT_H_120_200",
+      "pT_H_200_350",
+      "pT_H_350_inf"
+  ],
+  "/CMS_2025_I2915441/rapidity": [
+    "rapidity_H_0_0p15",
+    "rapidity_H_0p15_0p3",
+    "rapidity_H_0p3_0p6",
+    "rapidity_H_0p6_0p9",
+    "rapidity_H_0p9_2p5"
+],
+"/CMS_2025_I2915441/NJ": [
+    "njets_eta4p7_0",
+    "njets_eta4p7_1",
+    "njets_eta4p7_2",
+    "njets_eta4p7_geq3"
+],
+"/CMS_2025_I2915441/PTJ0": [
+    "jet_pt_lead_0_30",
+    "jet_pt_lead_30_75",
+    "jet_pt_lead_75_120",
+    "jet_pt_lead_120_200",
+    "jet_pt_lead_200_inf"
+],
+"/CMS_2025_I2915441/DPhiJ0J1": [
+    "dphi_jj_m5_m3p1415926536",
+    "dphi_jj_m3p1415926536_m2p09439510239",
+    "dphi_jj_m2p09439510239_m1p0471975512",
+    "dphi_jj_m1p0471975512_0",
+    "dphi_jj_0_1p0471975512",
+    "dphi_jj_1p0471975512_2p09439510239",
+    "dphi_jj_2p09439510239_3p1415926536"
+],
+    "/CMS_2025_I2915441/h_sigma": [
+        "h_sigma"
+],
+"/CMS_2025_I2915441/cos_theta_star": [
+    "cos_theta_star_0_0.07",
+    "cos_theta_star_0p07_0p15",
+    "cos_theta_star_0p15_0p22",
+    "cos_theta_star_0p22_0p35",
+    "cos_theta_star_0p35_0p45",
+    "cos_theta_star_0p45_0p55",
+    "cos_theta_star_0p55_0p75",
+    "cos_theta_star_0p75_1p0"
+  ],
+  "/Higgs2GGFiducialAndDifferential/pt_h": [
+    "pT_h_0_5",
+    "pT_h_5_10",
+    "pT_H_10_15",
+    "pT_h_15_20",
+    "pT_h_20_25",
+    "pT_h_25_30",
+    "pT_h_30_35",
+    "pT_h_35_45",
+    "pT_h_45_60",
+    "pT_h_60_80",
+    "pT_h_80_100",
+    "pT_h_100_120",
+    "pT_h_120_140",
+    "pT_h_140_170",
+    "pT_h_170_200",
+    "pT_h_200_250",
+    "pT_h_250_350",
+    "pT_h_350_450",
+    "pT_h_450_10000"
   ]
 }
