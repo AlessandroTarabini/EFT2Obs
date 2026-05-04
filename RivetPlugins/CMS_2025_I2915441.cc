@@ -35,19 +35,19 @@ namespace Rivet {
       declare(fs_jets, "JETS");
 
       //---Histograms 
-      // Run2 binning
-      // book(_h_pt_h, "pt_h",{0,5,10,15,20,25,30,35,45,60,80,100,120,140,170,200,250,350,450,10000}); 
-      // book(_h_rapidity_h, "rapidity_h", {0,0.15,0.3,0.6,0.9,2.5});
-      // book(_h_njets_eta2p5, "njets_eta2p5", {0,1,2,3,100});
-      // book(_h_jet_pt_lead, "jet_pt_lead", {0,30,75,120,200,13000});
-      // book(_h_cos_theta_star, "cos_theta_star", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
-      // 2022 binning 
-      book(_h_pt_h, "PTH",{0,15,30,45,80,120,200,350,13000}); 
-      book(_h_rapidity_h, "rapidity", {0,0.15,0.3,0.6,0.9,2.5});
-      book(_h_njets_eta4p7, "NJ", {0,1,2,3,100});
-      book(_h_jet_pt_lead, "PTJ0", {0,30,75,120,200,13000});
-      book(_h_dphi_jj, "DPhiJ0J1", {-5, -3.1415926536, -2.09439510239, -1.0471975512, 0, 1.0471975512, 2.09439510239, 3.1415926536});
+      // 22+23+24 binning
+      book(_h_pt_h, "PTH",{0,5,10,15,20,25,30,35,45,60,80,100,120,140,170,200,250,350,450,13000}); 
+      book(_h_rapidity_h, "rapidity", {0,0.15,0.3,0.45,0.6,0.75,0.9,1.2,1.6,2.0,2.5});
+      book(_h_njets_eta4p7, "NJ", {0,1,2,3,4,100});
+      book(_h_jet_pt_lead, "PTJ0", {0,30,40,55,75,95,120,150,200,13000});
       book(_h_cos_theta_star, "CosThetaStarCS", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
+      // 2022 binning 
+      // book(_h_pt_h, "PTH",{0,15,30,45,80,120,200,350,13000}); 
+      // book(_h_rapidity_h, "rapidity", {0,0.15,0.3,0.6,0.9,2.5});
+      // book(_h_njets_eta4p7, "NJ", {0,1,2,3,100});
+      // book(_h_jet_pt_lead, "PTJ0", {0,30,75,120,200,13000});
+      // book(_h_dphi_jj, "DPhiJ0J1", {-5, -3.1415926536, -2.09439510239, -1.0471975512, 0, 1.0471975512, 2.09439510239, 3.1415926536});
+      // book(_h_cos_theta_star, "CosThetaStarCS", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
       book(_h_sigma, "h_sigma", 1, 0, 2); // This is to get the cross section without fiducial cuts
     }
 
@@ -123,7 +123,8 @@ namespace Rivet {
 
       //---jets
       // auto jets_eta2p5 = apply<FastJets>(event, "JETS").jetsByPt(Cuts::abseta < 2.5 && Cuts::pt > 30 * GeV);
-      auto jets_eta4p7 = apply<FastJets>(event, "JETS").jetsByPt(Cuts::abseta < 4.7 && Cuts::pt > 30 * GeV);
+      auto jets_eta4p7 = apply<FastJets>(event, "JETS").jetsByPt((Cuts::abseta < 2.5 && Cuts::pt > 30 * GeV) || (Cuts::abseta > 2.5 && Cuts::pt > 50 * GeV));
+      auto jets_eta2p5 = apply<FastJets>(event, "JETS").jetsByPt(Cuts::abseta < 2.5 && Cuts::pt > 30 * GeV);
 
       //--- Isolate leptons for lepton cleaning
       //--- Implementing the logic for NanoAOD: https://github.com/bonanomi/cmssw/blob/69e3a519595c0d44d39dc8dc2f2ec562365ec90c/PhysicsTools/NanoAOD/plugins/GenPartIsoProducer.cc
@@ -149,12 +150,14 @@ namespace Rivet {
       // idiscardIfAnyDeltaRLess(jets_eta2p5, isolated_leptons, 0.4);
       idiscardIfAnyDeltaRLess(jets_eta4p7, isolated_photons, 0.4);
       idiscardIfAnyDeltaRLess(jets_eta4p7, isolated_leptons, 0.4);
+      idiscardIfAnyDeltaRLess(jets_eta2p5, isolated_photons, 0.4);
+      idiscardIfAnyDeltaRLess(jets_eta2p5, isolated_leptons, 0.4);
 
       // _h_njets_eta2p5->fill(jets_eta2p5.size());
       _h_njets_eta4p7->fill(jets_eta4p7.size());
 
-      if (jets_eta4p7.size() > 0) {
-        _h_jet_pt_lead->fill(jets_eta4p7[0].pt() / GeV);
+      if (jets_eta2p5.size() > 0) {
+        _h_jet_pt_lead->fill(jets_eta2p5[0].pt() / GeV);
       }else{
         _h_jet_pt_lead->fill(0); // For the underflow bin Njet = 0
       }
