@@ -46,7 +46,7 @@ namespace Rivet {
       // book(_h_rapidity_h, "rapidity", {0,0.15,0.3,0.6,0.9,2.5});
       // book(_h_njets_eta4p7, "NJ", {0,1,2,3,100});
       // book(_h_jet_pt_lead, "PTJ0", {0,30,75,120,200,13000});
-      // book(_h_dphi_jj, "DPhiJ0J1", {-5, -3.1415926536, -2.09439510239, -1.0471975512, 0, 1.0471975512, 2.09439510239, 3.1415926536});
+      book(_h_dphi_jj, "DPhiJ0J1", {-5, -3.1415926536, -1.5707963268, 0, 1.5707963268, 3.1415926536});
       // book(_h_cos_theta_star, "CosThetaStarCS", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
       book(_h_sigma, "h_sigma", 1, 0, 2); // This is to get the cross section without fiducial cuts
     }
@@ -163,9 +163,14 @@ namespace Rivet {
       }
 
       if (jets_eta4p7.size() > 1) {
-        _h_dphi_jj->fill(deltaphi_jj(jets_eta4p7[0].mom(), jets_eta4p7[1].mom()));
-      }else{
-        _h_dphi_jj->fill(-4); // For the underflow 
+        FourMomentum mom_jj = jets_eta4p7[0].mom() + jets_eta4p7[1].mom();
+        if (mom_jj.mass() >= 450 * GeV && abs(deltaEta(jets_eta4p7[0].mom(), jets_eta4p7[1].mom())) > 3.0) {
+          _h_dphi_jj->fill(deltaphi_jj(jets_eta4p7[0], jets_eta4p7[1]));
+        } else {
+          _h_dphi_jj->fill(-4); // For the underflow
+        }
+      } else {
+        _h_dphi_jj->fill(-4); // For the underflow
       }
 
     }
