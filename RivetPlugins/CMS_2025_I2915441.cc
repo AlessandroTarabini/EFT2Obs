@@ -41,6 +41,7 @@ namespace Rivet {
       book(_h_njets_eta4p7, "NJ", {0,1,2,3,4,100});
       book(_h_jet_pt_lead, "PTJ0", {0,30,40,55,75,95,120,150,200,13000});
       book(_h_cos_theta_star, "CosThetaStarCS", {0.,0.07,0.15,0.22,0.35,0.45, 0.55, 0.75, 1.0});
+      book(_h_mjj, "MJJ", {-5, 0, 90, 160, 300, 500, 1000, 13000});
       // 2022 binning 
       // book(_h_pt_h, "PTH",{0,15,30,45,80,120,200,350,13000}); 
       // book(_h_rapidity_h, "rapidity", {0,0.15,0.3,0.6,0.9,2.5});
@@ -164,12 +165,14 @@ namespace Rivet {
 
       if (jets_eta4p7.size() > 1) {
         FourMomentum mom_jj = jets_eta4p7[0].mom() + jets_eta4p7[1].mom();
+        _h_mjj->fill(mom_jj.mass() / GeV);
         if (mom_jj.mass() >= 450 * GeV && abs(deltaEta(jets_eta4p7[0].mom(), jets_eta4p7[1].mom())) > 3.0) {
           _h_dphi_jj->fill(deltaphi_jj(jets_eta4p7[0], jets_eta4p7[1]));
         } else {
           _h_dphi_jj->fill(-4); // For the underflow
         }
       } else {
+        _h_mjj->fill(-4); // For the underflow
         _h_dphi_jj->fill(-4); // For the underflow
       }
 
@@ -182,6 +185,7 @@ namespace Rivet {
       scale(_h_jet_pt_lead, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_dphi_jj, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_cos_theta_star, crossSection() / femtobarn * BR / sumOfWeights());
+      scale(_h_mjj, crossSection() / femtobarn * BR / sumOfWeights());
       scale(_h_sigma, crossSection() / femtobarn * BR / sumOfWeights());
     }
 
@@ -193,6 +197,7 @@ namespace Rivet {
     Histo1DPtr _h_jet_pt_lead;
     Histo1DPtr _h_dphi_jj;
     Histo1DPtr _h_cos_theta_star;
+    Histo1DPtr _h_mjj;
     Histo1DPtr _h_sigma;
     const double BR = 0.00227;
   };
